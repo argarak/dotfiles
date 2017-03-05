@@ -19,7 +19,7 @@ xsetroot -cursor_name left_ptr
 setxkbmap -layout dvorak
 mpd .mpd &
 #/usr/bin/emacs --daemon &
-redshift -l 56.009715:-3.722770 &
+redshift -l geoclue &
 
 sxhkd &
 #exec awesome
