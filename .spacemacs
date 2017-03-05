@@ -41,23 +41,34 @@ values."
      colors
      gtags
      github
-     themes-megapack
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     spell-checking
+     ;; spell-checking
      syntax-checking
-     version-control
+     ;; version-control
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(writeroom-mode
+   dotspacemacs-additional-packages '(processing-mode
+                                      writeroom-mode
                                       visual-fill-column
                                       wc-goal-mode
                                       arduino-mode
-                                      company-arduino)))
+                                      company-arduino
+                                      sws-mode
+                                      stylus-mode
+                                      minimap
+                                      neotree
+                                      jazz-theme
+                                      latex-preview-pane
+                                      simple-httpd
+                                      htmlize
+                                      impatient-mode
+                                      markdown-mode
+                                      markdown-mode+)))
 (defun dotspacemacs/init ()
   "Initialization function.
 This function is called at the very startup of Spacemacs initialization
@@ -83,7 +94,7 @@ values."
    ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
    ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
    ;; unchanged. (default 'vim)
-   dotspacemacs-editing-style 'emacs
+   dotspacemacs-editing-style 'hybrid
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
@@ -105,14 +116,7 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(jazz
-                         spacemacs-dark
-                         spacemacs-light
-                         solarized-light
-                         solarized-dark
-                         leuven
-                         monokai
-                         zenburn)
+   dotspacemacs-themes '(jazz)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -261,10 +265,35 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
+  (setq dotspacemacs-elpa-https 'nil)
+  (setq flyspell-issue-message-flag 'nil)
+
+  (setq redisplay-dont-pause t)
+
+  (require 'w3m-load)
+
+  (spaceline-toggle-window-number-off)
+
   (setq powerline-default-separator 'nil)
   (setq linum-format " %d ")
 
-  ;; Web-Mode
+  (add-to-list 'load-path "~/.emacs.d/smart-quotes/")
+
+  (require 'smart-quotes)
+  (add-hook 'markdown-mode-hook 'turn-on-smart-quotes)
+
+  (require 'langtool)
+  (setq langtool-language-tool-jar "/home/kzer-za/LanguageTool-3.4/languagetool-commandline.jar")
+
+  (global-set-key "\C-x4w" 'langtool-check)
+  (global-set-key "\C-x4W" 'langtool-check-done)
+  (global-set-key "\C-x4l" 'langtool-switch-default-language)
+  (global-set-key "\C-x44" 'langtool-show-message-at-point)
+  (global-set-key "\C-x4c" 'langtool-correct-buffer)
+
+  (setq langtool-default-language "en-GB")
+  (setq langtool-java-bin "/usr/bin/java")
+
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
@@ -279,19 +308,23 @@ you should place your code here."
   (setq-default header-line-format mode-line-format)
   (setq-default mode-line-format nil)
 
-;;  (load-file "~/.emacs.d/oneonone.el")
+  (require 'sws-mode)
+  (require 'jade-mode)
 
-  ;;(require 'oneonone)
-  ;;(1on1-emacs)
+  (add-to-list 'auto-mode-alist '("\\.styl\\'" . sws-mode))
 
-  (add-to-list 'default-frame-alist '(font . "Ubuntu Mono derivative Powerline-18" ))
-  (set-face-attribute 'default t :font "Ubuntu Mono derivative Powerline-18" )
+  ;;(add-to-list 'default-frame-alist '(font . "Roboto Mono-12" ))
+  ;;(set-face-attribute 'default t :font "Roboto Mono-12" )
 
   (set-face-attribute 'default nil :height 180)
 
   (add-hook 'markdown-mode-hook 'wc-goal-mode)
   (add-hook 'markdown-mode-hook 'writeroom-mode)
   (add-hook 'markdown-mode-hook 'flyspell-mode)
+
+  (setq processing-location "/usr/bin/processing-java")
+  (setq processing-application-dir "/usr/bin/processing")
+  (setq processing-sketchbook-dir "~/sketchbook")
 
   (defun nolinum ()
     (linum-mode 0)
@@ -328,6 +361,9 @@ you should place your code here."
   ;; Activate irony-mode on arudino-mode
   (add-hook 'arduino-mode-hook 'irony-mode)
 
+  (add-to-list 'load-path "~/.emacs.d/impatient-mode")
+  (require 'impatient-mode)
+
   ;; End of config
   (spaceline-compile)
 
@@ -340,12 +376,13 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(Linum-format "%7i ")
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(ansi-term-color-vector
-   [unspecified "#272822" "#f92672" "#a6e22e" "#f4bf75" "#66d9ef" "#ae81ff" "#66d9ef" "#f8f8f2"])
+   [unspecified "#272822" "#f92672" "#a6e22e" "#f4bf75" "#66d9ef" "#ae81ff" "#66d9ef" "#f8f8f2"] t)
  '(async-bytecomp-package-mode t)
  '(blink-cursor-mode nil)
  '(compilation-message-face (quote default))
@@ -353,7 +390,7 @@ you should place your code here."
  '(custom-enabled-themes (quote (jazz)))
  '(custom-safe-themes
    (quote
-    (default)))
+    ("12ced60b9eec2ec25d781a556c1ecf2c582700439f56ca18c281b3fb7670e5e6" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "8936325181ad91e3c0a4292f9912fa28da358c159b5dae2af3728bbcfa07ae9e" "e03bebe267c8599b02112a1aa7f9a0ab0a2f47048bfb6a8ab67bd9e1a44085c4" "c39ae5721fce3a07a27a685c08e4b856a13780dbc755a569bb4393c932f226d7" default)))
  '(diary-entry-marker (quote font-lock-variable-name-face))
  '(emms-mode-line-icon-image-cache
    (quote
@@ -376,10 +413,11 @@ static char *note[] = {
 \"#######...\",
 \"######....\",
 \"#######..#\" };")))
+ '(fci-rule-character-color "#202020")
  '(fci-rule-color "#3a3a3a" t)
  '(fringe-mode 6 nil (fringe))
  '(global-linum-mode t)
- '(gnus-logo-colors (quote ("#528d8d" "#c0c0c0")))
+ '(gnus-logo-colors (quote ("#528d8d" "#c0c0c0")) t)
  '(gnus-mode-line-image-cache
    (quote
     (image :type xpm :ascent center :data "/* XPM */
@@ -402,7 +440,7 @@ static char *gnus-pointer[] = {
 \"######..###.######\",
 \"###....####.######\",
 \"###..######.######\",
-\"###########.######\" };")))
+\"###########.######\" };")) t)
  '(highlight-changes-colors (quote ("#FD5FF0" "#AE81FF")))
  '(highlight-tail-colors
    (quote
@@ -415,12 +453,15 @@ static char *gnus-pointer[] = {
      ("#F309DF" . 85)
      ("#49483E" . 100))))
  '(hl-paren-background-colors (quote ("#2492db" "#95a5a6" nil)))
- '(hl-paren-colors (quote ("#ecf0f1" "#ecf0f1" "#c0392b")))
+ '(hl-paren-colors (quote ("#ecf0f1" "#ecf0f1" "#c0392b")) t)
  '(hl-sexp-background-color "#121212")
  '(inhibit-startup-screen t)
  '(linum-format " %2d ")
  '(linum-relative-current-symbol "")
  '(magit-diff-use-overlays nil)
+ '(main-line-color1 "#1E1E1E")
+ '(main-line-color2 "#111111")
+ '(main-line-separator-style (quote chamfer))
  '(menu-bar-mode nil)
  '(notmuch-search-line-faces
    (quote
@@ -430,15 +471,23 @@ static char *gnus-pointer[] = {
  '(nrepl-message-colors
    (quote
     ("#336c6c" "#205070" "#0f2050" "#806080" "#401440" "#6c1f1c" "#6b400c" "#23733c")))
+ '(org-bullets-bullet-list (quote ("‣" "•" "◦" "⁃")))
  '(package-archives
    (quote
-    (("marmalade" . "http://marmalade-repo.org/packages/")
+    (("marmalade" . "https://marmalade-repo.org/packages/")
      ("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/"))))
  '(package-enable-at-startup nil)
+ '(package-selected-packages
+   (quote
+    (markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
  '(pos-tip-background-color "#262626")
  '(pos-tip-foreground-color "#272822")
+ '(powerline-color1 "#1E1E1E")
+ '(powerline-color2 "#111111")
  '(powerline-default-separator nil)
+ '(processing-application-dir "/usr/bin/processing" t)
+ '(processing-location "/usr/bin/processing-java" t)
  '(rainbow-identifiers-cie-l*a*b*-lightness 70)
  '(rainbow-identifiers-cie-l*a*b*-saturation 20)
  '(sml/active-background-color "#34495e")
@@ -446,6 +495,7 @@ static char *gnus-pointer[] = {
  '(sml/inactive-background-color "#dfe4ea")
  '(sml/inactive-foreground-color "#34495e")
  '(tool-bar-mode nil)
+ '(undo-tree-visualizer-diff nil)
  '(use-package-inject-hooks t)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
@@ -479,6 +529,7 @@ static char *gnus-pointer[] = {
        (not
         (facep
          (aref ansi-term-color-vector 0)))))
+ '(window-numbering-mode nil)
  '(writeroom-mode-line t)
  '(writeroom-width 110)
  '(xterm-color-names
@@ -490,6 +541,14 @@ static char *gnus-pointer[] = {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#111111" :foreground "#c6a57b" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 180 :width normal :foundry "DAMA" :family "Ubuntu Mono derivative Powerline"))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
- '(linum ((t (:background "#151515" :foreground "#505050")))))
+ '(fringe ((((class color) (min-colors 89)) (:foreground "#888888" :background "#111111"))))
+ '(linum ((t (:background "#111111" :foreground "#383838"))))
+ '(mode-line ((t (:background "#0e0e0e" :foreground "#c6a57b" :box nil))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#0e0e0e" :foreground "#c6a57b" :box (:line-width 5 :color "#101010")))))
+ '(powerline-active1 ((t (:inherit mode-line :background "#0e0e0e"))))
+ '(powerline-active2 ((t (:inherit mode-line :background "#0e0e0e"))))
+ '(powerline-inactive1 ((t (:inherit mode-line-inactive :background "#0e0e0e"))))
+ '(powerline-inactive2 ((t (:inherit font-lock-comment-face :background "#0e0e0e")))))

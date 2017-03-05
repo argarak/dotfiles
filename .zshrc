@@ -5,7 +5,9 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="af-magic"
+
+DEFAULT_USER="kzer-za"
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -26,7 +28,7 @@ CASE_SENSITIVE="true"
 ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -36,7 +38,7 @@ ENABLE_CORRECTION="true"
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="dd/mm/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -45,7 +47,8 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git command-not-found ruby emacs safe-paste sudo history archlinux colorize python)
+
+plugins=(git command-not-found emacs safe-paste sudo history archlinux colorize python colored-man-pages copydir copyfile cp dirpersist extract npm node)
 
 # User configuration
 
@@ -59,7 +62,7 @@ export LANG=en_GB.UTF-8
 
 # Preferred editor for local and remote sessions
  if [[ -n $SSH_CONNECTION ]]; then
-   export EDITOR='emacs'
+   export EDITOR='emacs -nw'
  else
    export EDITOR='nano'
  fi
@@ -80,16 +83,15 @@ export ARCHFLAGS="-arch x86_64"
 alias poweroff="systemctl poweroff -i"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 export CLASSPATH=/usr/lib/spl.jar
-alias torsocks="~/haha"
 alias cava_mpd='cava -c red -d 'default' -i 'fifo' -p /tmp/mpd.fifo -s 150%'
 alias emacsterm='emacs -nw && emacsclient -nw'
 alias toxic='toxic -f .config/tox/tox_save.tox'
 alias rm="trash"
-alias del="rm"
 alias yaourt="/home/kzer-za/apacman/apacman --noconfirm"
 alias dd="echo try using pv"
 alias asdf="setxkbmap -layout dvorak"
 alias cups_print="lp -d Photosmart_C4400_Recent"
+alias y="yaourt"
 eval "$(thefuck --alias fuck)"
 
 if [ -f ~/.dir_colors ]; then
@@ -97,3 +99,9 @@ if [ -f ~/.dir_colors ]; then
 fi
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export PATH="$PATH:$HOME/bin"
+
+function project() {
+  A=$1
+  cd ~/work/${A}
+}

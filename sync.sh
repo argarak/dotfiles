@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a dotfiles=(".spacemacs" ".config/awesome" ".config/termite" ".zshrc" ".xinitrc")
+declare -a dotfiles=(".spacemacs" ".config/termite" ".zshrc" ".xinitrc" ".config/bspwm" ".config/sxhkd")
 
 for i in "${dotfiles[@]}"
 do

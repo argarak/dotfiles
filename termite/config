@@ -7,17 +7,20 @@ allow_bold = true
 dynamic_title = true
 urgent_on_bell = true
 clickable_url = true
-font = Droid Sans Mono for Powerline 9
+#font = Droid Sans Mono for Powerline 9
+#font = Screen 12
+#font = Haxor 12
+#font = SGI Screen 12
+font = ypn envypn 12
 scrollback_lines = 10000
 search_wrap = true
 icon_name = terminal
-#geometry = 640x480
 
 # "system", "on" or "off"
-cursor_blink = system
+cursor_blink = off
 
 # "block", "underline" or "ibeam"
-cursor_shape = block
+cursor_shape = ibeam
 
 # $BROWSER is used by default if set, with xdg-open as a fallback
 #browser = xdg-open
@@ -73,22 +76,22 @@ cursor_shape = block
 
 # Powerarrow Darker
 [colors]
-background= #1A1A1A
-foreground= #DDDDFF
-#black
-color0 = #073642
-color1 = #dc322f
-color2 = #859900
-color3 = #b58900
-color4 = #268bd2
-color5 = #d33682
-color6 = #2aa198
+background= #0e0e0e
+foreground= #888888
+color0 = #333333
+color1 = #f44336
+color2 = #EC407A
+color3 = #E91E63
+color4 = #444444
+color5 = #3F51B5
+color6 = #E91E63
 color7 = #eee8d5
-color8 = #002b36
+color8 = #b71c1c
 color9 = #cb4b16
-color10 = #586e75
-color11 = #FAFAFA
-color12 = #839496
-color13 = #6c71c4
-color14 = #93a1a1
+color10 = #9C27B0
+color11 = #673AB7
+color12 = #f44336
+color13 = #3F51B5
+color14 = #3F51B5
 color15 = #fdf6e3
+color16 = #673AB7
