@@ -69,26 +69,33 @@ super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous node in the current desktop
-super + {_,shift + }c
+super + {_,shift + }n
 	bspc node -f {next,prev}.local
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
+  python ~/panel.py >> /tmp/lemonbarout &; \
 	bspc desktop -f {prev,next}.local
 
 # focus the last node/desktop
 super + {grave,Tab}
+  python ~/panel.py >> /tmp/lemonbarout &;\
 	bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
 super + {o,i}
+  python ~/panel.py >> /tmp/lemonbarout &; \
 	bspc wm -h off; \
 	bspc node {older,newer} -f; \
 	bspc wm -h on
 
+super + j
+  bspc node -f prev
+
 # focus or send to the given desktop
 alt + {_,shift + }{1-9,0}
-	bspc {desktop -f,node -d} '^{1-9,10}'
+  python ~/panel.py >> /tmp/lemonbarout &; \
+  bspc {desktop -f,node -d} '^{1-9,10}'
 
 #
 # preselect
@@ -126,14 +133,20 @@ super + alt + shift + {h,j,k,l}
 super + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
-super + ctrl + up
+super + ctrl + Up
   mpc toggle
 
-super + ctrl + right
+super + ctrl + Right
   mpc next
 
-super + ctrl + left
+super + ctrl + Left
   mpc prev
 
-suport + crtl + down
+super + ctrl + Down
   mpc stop
+
+super + Home
+  amixer -q sset Master 5%+
+
+super + End
+  amixer -q sset Master 5%-
