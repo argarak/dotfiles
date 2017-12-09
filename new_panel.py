@@ -19,10 +19,11 @@
 # You will need to create a socat stream for this script to function correctly.                                #
 # Create the stream by running this at startup:                                                                #
 #     socat -d -d pty,raw,echo=0,link=/tmp/lemonbarin pty,raw,echo=0,link=/tmp/lemonbarout &                   #
-#                                                                                                              #
-# And for creating lemonbar itself:                                                                            #
-#     cat /tmp/lemonbarin | lemonbar -p -g 1920x24+0+0 -d -f "ypn envypn" -f FontAwesome-10 -b -B \#FF070707 & #
-#                                                                                                              #
+#                                                                                                             ##
+# And for creating lemonbar itself:                                
+#     cat /tmp/lemonbarin | lemonbar -p -g 1920x24+0+0 -d -o 0 -f "ypn envypn"\          
+#      -o \-1 -f '-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1' -b -B \#FF0f0403 -u 2 &
+#                                                                                                             ##
 # Feel free to change the colours or fonts and adjust the screen size if needed.                               #
 #                                                                                                              #
 ################################################################################################################
@@ -49,9 +50,9 @@ ACCENT_COLOR="#c62828"
 ACCENT_DARK="#b71c1c"
 ACCENT_SUB_LIGHT="#d32f2f"
 TEXT_COLOR="#E7E7E7"
-PINK="#E91E63"
-PINK_DARK="#880E4F"
-PINK_MID="#AD1457"
+PINK="#ef9a9a"
+PINK_DARK="#ef5350"
+PINK_MID="#c62828"
 PURPLE="#9C27B0"
 PURPLE_DARK="#4A148C"
 PURPLE_MID1="#6A1B9A"
@@ -61,16 +62,32 @@ PURPLE_LIGHT="#AB47BC"
 date_format = "%a %b %d"
 time_format = "%H:%M"
 
-def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=TEXT_COLOR):
+def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=None):
     lout = ""
+
+    ucolor = ""
+
+    for i in range(0, len(bcolor[1:])):
+        if i % 2 == 0:
+            ucolor += "0"
+        else:
+            ucolor += bcolor[i]
+
+    #lout += "%{+u}"
+    #lout += "%{U" + bcolor + "}"
 
     if direction != False:
         lout += "%{" + direction + "}"
 
     lout += "%{F" + bcolor + "}"
+    lout += "%{B" + "#" + ucolor + "}"
+
     lout += " " + data + " "
     lout += "%{B-}"
     lout += "%{F-}"
+
+    #lout += "%{U-}"
+    #lout += "%{-u}"
 
     return lout.rstrip()
 
@@ -81,10 +98,10 @@ def get_dump_list():
 dump_list = get_dump_list()
 
 def get_date():
-    return lemon_out(time.strftime(date_format), "l", ACCENT_DARK)
+    return lemon_out(u"\ue26a" + " " + time.strftime(date_format), False, ACCENT_DARK)
 
 def get_time():
-    return lemon_out(time.strftime(time_format))
+    return lemon_out(u"\ue017" + " " + time.strftime(time_format))
 
 current_song = {}
 
@@ -157,17 +174,17 @@ def get_mpd():
     status = mpd_client.status()
 
     if status['state'] == "pause":
-        state_char = u"\uf04c"
+        state_char = u"\ue059"
     else:
-        state_char = u"\uf04b"
+        state_char = u"\ue058"
 
     if status['state'] != "stop":
-        return lemon_out(state_char + " " + artist + title, False, ACCENT_COLOR)
+        return lemon_out(state_char + " " + artist + title, "r", ACCENT_COLOR)
     else:
         return ""
 
 def get_workspaces():
-    lout = "%{c}"
+    lout = "%{l}"
 
     # Support for one monitor atm
     desktops = dump_list["monitors"][0]["desktops"];
@@ -184,7 +201,7 @@ def get_workspaces():
     return lout
 
 def get_cpu_usage():
-    return lemon_out(str(round(psutil.cpu_percent())).rjust(3) + "%", False, PURPLE_MID2)
+    return lemon_out(u"\ue0c4" + " " + str(round(psutil.cpu_percent())).rjust(3) + "%", False, PURPLE_MID2)
 
 def get_temps():
     temps = subprocess.check_output(["sensors -u | grep temp1_input"], shell=True).decode().split('\n')
@@ -192,16 +209,27 @@ def get_temps():
     gpu_temp = round(float(temps[0].strip(" ")[13:]), 2)
     cpu_temp = round(float(temps[1].strip(" ")[13:]), 2)
 
-    return lemon_out(str(cpu_temp).rjust(5) + u"\u00B0" + "C", False, PURPLE_MID1) + lemon_out(str(gpu_temp).rjust(5) + u"\u00B0" + "C", False, PURPLE_DARK)
+    return lemon_out(u"\ue0ca" + " " + str(cpu_temp).rjust(5) + u"\u00B0" + "C", False, PURPLE_MID1) + lemon_out(str(gpu_temp).rjust(5) + u"\u00B0" + "C", False, PURPLE_DARK)
 
 def get_current_vol():
     m = alsaaudio.Mixer()
-    return lemon_out(str(m.getvolume()[0]) + "%", False, PURPLE)
+    volume = m.getvolume()[0]
+    state = ""
+
+    if volume > 50:
+        state = u"\ue05d"
+    elif volume > 0:
+        state = u"\ue050"
+    else:
+        state = u"\ue04e"
+
+    return lemon_out(state + " " + str(volume) + "%", False, PURPLE)
 
 import keyring
 import imaplib
 
 mail_count = ""
+mail_state = ""
 
 # Hi, you've got mail!
 #
@@ -212,6 +240,7 @@ mail_count = ""
 #
 def get_mail():
     global mail_count
+    global mail_state
 
     if (int(time.strftime("%M")) % 15 == 0) or (not mail_count):
         mail = imaplib.IMAP4_SSL(keyring.get_password("mail", "address_imap_1"))
@@ -226,12 +255,17 @@ def get_mail():
 
         mail_count = str(len(messages[0].split()))
 
-        if retcode == 'OK':
-            return lemon_out(mail_count, "r", PURPLE_LIGHT)
+        if len(messages[0].split()) > 0:
+            mail_state = u"\ue229"
         else:
-            return lemon_out("null", "r", PURPLE_LIGHT)
+            mail_state = u"\ue228"
 
-    return lemon_out(mail_count, "r", PURPLE_LIGHT)
+        if retcode == 'OK':
+            return lemon_out(mail_count, False, PURPLE_LIGHT)
+        else:
+            return lemon_out("null", False, PURPLE_LIGHT)
+
+    return lemon_out(mail_state + " " + mail_count, False, PURPLE_LIGHT)
 
 def get_mail_lemonbar():
     pass
@@ -244,18 +278,18 @@ def render_panel():
     current_list = ""
 
     # Left
-    current_list += get_date()
-    current_list += get_time()
-    current_list += get_mpd()
-
-    # Center
     current_list += get_workspaces()
+    # Center
 
     # Right
-    current_list += get_mail()
+    current_list += get_mpd()
     current_list += get_current_vol()
+    current_list += get_mail()
     current_list += get_cpu_usage()
     current_list += get_temps()
+    current_list += get_date()
+    current_list += get_time()
+
 
     return current_list
 
