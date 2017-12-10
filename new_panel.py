@@ -62,7 +62,7 @@ PURPLE_LIGHT="#AB47BC"
 date_format = "%a %b %d"
 time_format = "%H:%M"
 
-def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=None):
+def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=None, underline=None):
     lout = ""
 
     ucolor = ""
@@ -73,8 +73,9 @@ def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=None):
         else:
             ucolor += bcolor[i]
 
-    #lout += "%{+u}"
-    #lout += "%{U" + bcolor + "}"
+    if underline:
+        lout += "%{+u}"
+        lout += "%{U" + underline + "}"
 
     if direction != False:
         lout += "%{" + direction + "}"
@@ -86,8 +87,9 @@ def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=None):
     lout += "%{B-}"
     lout += "%{F-}"
 
-    #lout += "%{U-}"
-    #lout += "%{-u}"
+    if underline:
+        lout += "%{U-}"
+        lout += "%{-u}"
 
     return lout.rstrip()
 
@@ -181,13 +183,13 @@ def get_mpd():
     if status['state'] != "stop":
         return lemon_out(state_char + " " + artist + title, "r", ACCENT_COLOR)
     else:
-        return ""
+        return lemon_out("", "r", ACCENT_COLOR)
 
 def get_workspaces():
     lout = "%{l}"
 
     # Support for one monitor atm
-    desktops = dump_list["monitors"][0]["desktops"];
+    desktops = dump_list["monitors"][0]["desktops"]
     currently_focused = int(subprocess.check_output(["bspc", "query", "--desktops", "--desktop", "focused"]).decode().rstrip(), 16)
 
     for i in desktops:
@@ -197,6 +199,35 @@ def get_workspaces():
             lout += lemon_out(i["name"], False, PINK_DARK)
         else:
             lout += lemon_out(i["name"], False, PINK)
+
+    return lout
+
+def get_clients():
+    try:
+        window_id_out = subprocess.check_output(["bspc", "query", "-N", "-n", ".window", "-d", "focused"]).decode().rstrip()
+        current_id = subprocess.check_output(["bspc", "query", "-N", "-n", "focused"]).decode().rstrip()
+    except subprocess.CalledProcessError:
+        return ""
+
+    window_ids = window_id_out.split("\n")
+
+    if not window_ids:
+        return ""
+
+    lout = "%{c}"
+
+    for i, val in enumerate(window_ids):
+        title = subprocess.check_output(["xtitle", "-e", val]).decode().rstrip()
+
+        if title[0] == "/":
+            title = title.split("/")[len(title.split("/")) - 1]
+
+        title = (title[:20] + '..') if len(title) > 20 else title
+
+        if val == current_id:
+            lout += lemon_out(title, False, ACCENT_COLOR, None, ACCENT_COLOR)
+        else:
+            lout += lemon_out(title)
 
     return lout
 
@@ -279,7 +310,9 @@ def render_panel():
 
     # Left
     current_list += get_workspaces()
+
     # Center
+    current_list += get_clients()
 
     # Right
     current_list += get_mpd()
