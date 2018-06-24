@@ -24,7 +24,7 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      emacs-packages
-     auto-completion
+     ;; auto-completion
      better-defaults
      emacs-lisp
      git
@@ -35,16 +35,17 @@ values."
      c-c++
      python
      lua
-     emacs-lisp
+     ;; emacs-lisp
      latex
      shell-scripts
      colors
      gtags
      github
+     mu4e
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     ;; spell-checking
+     spell-checking
      syntax-checking
      ;; version-control
      )
@@ -53,22 +54,24 @@ values."
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(processing-mode
-                                      writeroom-mode
                                       visual-fill-column
                                       wc-goal-mode
                                       arduino-mode
-                                      company-arduino
                                       sws-mode
                                       stylus-mode
                                       minimap
                                       neotree
                                       jazz-theme
-                                      latex-preview-pane
                                       simple-httpd
                                       htmlize
                                       impatient-mode
                                       markdown-mode
-                                      markdown-mode+)))
+                                      nginx-mode
+                                      yaml-mode
+                                      column-enforce-mode
+                                      fill-column-indicator
+                                      adaptive-wrap
+                                      prettier-js)))
 (defun dotspacemacs/init ()
   "Initialization function.
 This function is called at the very startup of Spacemacs initialization
@@ -94,7 +97,7 @@ values."
    ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
    ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
    ;; unchanged. (default 'vim)
-   dotspacemacs-editing-style 'hybrid
+   dotspacemacs-editing-style 'emacs
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
@@ -103,7 +106,7 @@ values."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner nil
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
@@ -121,8 +124,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+   dotspacemacs-default-font '("ypn-envypn"
+                               :size 12
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -217,7 +220,7 @@ values."
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters the
    ;; point when it reaches the top or bottom of the screen. (default t)
-   dotspacemacs-smooth-scrolling t
+   dotspacemacs-smooth-scrolling nil
    ;; If non nil line numbers are turned on in all `prog-mode' and `text-mode'
    ;; derivatives. If set to `relative', also turns on relative line numbers.
    ;; (default nil)
@@ -255,6 +258,9 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+  (require 'mu4e)
   )
 
 (defun dotspacemacs/user-config ()
@@ -264,6 +270,122 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  ;; (defun my-org-inline-css-hook (exporter)
+  ;;   "Insert custom inline css"
+  ;;   (when (eq exporter 'html)
+  ;;     (let* ((dir (ignore-errors (file-name-directory (buffer-file-name))))
+  ;;            (path (concat dir "style.css"))
+  ;;            (homestyle (or (null dir) (null (file-exists-p path))))
+  ;;            (final (if homestyle "~/.emacs.d/org-style.css" path))) ;; <- set your own style file path
+  ;;       (setq org-html-head-include-default-style nil)
+  ;;       (setq org-html-head (concat
+  ;;                            "<style type=\"text/css\">\n"
+  ;;                            "<!--/*--><![CDATA[/*><!--*/\n"
+  ;;                            (with-temp-buffer
+  ;;                              (insert-file-contents final)
+  ;;                              (buffer-string))
+  ;;                            "/*]]>*/-->\n"
+  ;;                            "</style>\n")))))
+
+  ;; (add-hook 'org-export-before-processing-hook 'my-org-inline-css-hook)
+
+  ;; set maximum indentation for description lists
+  (setq org-list-description-max-indent 5)
+
+  (advice-add 'org-latex--inline-image :around
+              (lambda (orig link info)
+                (concat
+                 "\\begin{center}"
+                 (funcall orig link info)
+                 "\\end{center}")))
+
+  ;; prevent demoting heading also shifting text inside sections
+  (setq org-adapt-indentation nil)
+
+  (fset 'init-wiki-table
+   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([134217848 114 101 112 108 97 99 101 45 115 116 114 105 110 103 return 70 105 108 101 58 return 109 101 100 105 97 58 return escape 60 return return up up 123 124 32 99 108 97 115 115 61 34 34 left 119 105 107 105 116 97 98 108 101 right return 124 45 return 33 32 115 99 111 112 101 61 34 34 left 99 111 108 right 124 32 78 97 119 101 return 33 32 115 99 111 112 101 61 34 99 111 108 34 124 32 85 82 76 up backspace 109 down return 124 45 return 124 32 115 99 111 112 101 61 34 34 left 114 111 119 right 124 32 86 105 115 backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace down backspace down 1 124 32 down 1 up return up 124 32 115 99 111 112 101 61 34 34 left 114 111 119 right 124 down 1 right right right right right right right right right right 67108896 5 left left left left left left 134217847 up 32 25 down 5 left left 124 80 68 70 5 return 124 45] 0 "%d")) arg)))
+
+  (add-to-list 'load-path "~/.emacs.d/mu4e-multi/")
+  (require 'mu4e-multi)
+
+  (setq mu4e-maildir "/home/kzer-za/mail")
+
+  (setq mu4e-account-alist
+        '(("cryptolab"
+           ;; Under each account, set the account-specific variables you want.
+           (mu4e-sent-messages-behavior sent)
+           (mu4e-sent-folder "/cryptolab/sent")
+           (mu4e-drafts-folder "/cryptolab/drafts")
+           (mu4e-trash-folder  "/cryptolab/deleted")
+           (mu4e-refile-folder "/cryptolab/archive")
+           (user-mail-address "kzer-za@cryptolab.net")
+           (user-full-name "Jakub Kukielka"))
+          ("privateemail"
+           (mu4e-sent-messages-behavior sent)
+           (mu4e-sent-folder "/privateemail/sent")
+           (mu4e-drafts-folder "/privateemail/drafts")
+           (mu4e-trash-folder  "/privateemail/deleted")
+           (mu4e-refile-folder "/privateemail/archive")
+           (user-mail-address "contact@argarak.me")
+           (user-full-name "Jakub Kukielka"))))
+  (mu4e/mail-account-reset)
+
+  (mu4e-multi-enable)
+
+  ;;; Set up some common mu4e variables
+  (setq mu4e-maildir "~/.mail"
+        mu4e-trash-folder "/Trash"
+        mu4e-refile-folder "/Archive"
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-update-interval nil
+        mu4e-compose-signature-auto-include nil
+        mu4e-view-show-images t
+        mu4e-view-show-addresses t)
+
+  ;;; Mail directory shortcuts
+  (setq mu4e-maildir-shortcuts
+        '(("/gmail/INBOX" . ?g)
+          ("/college/INBOX" . ?c)))
+
+  ;;; Bookmarks
+  (setq mu4e-bookmarks
+        `(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+          ("date:today..now" "Today's messages" ?t)
+          ("date:7d..now" "Last 7 days" ?w)
+          ("mime:image/*" "Messages with images" ?p)
+          (,(mapconcat 'identity
+                       (mapcar
+                        (lambda (maildir)
+                          (concat "maildir:" (car maildir)))
+                        mu4e-maildir-shortcuts) " OR ")
+           "All inboxes" ?i)))
+
+  (setq mu4e-enable-notifications t)
+
+  (with-eval-after-load 'mu4e-alert
+    ;; Enable Desktop notifications
+    (mu4e-alert-set-default-style 'notifications)) ; For linux
+    ;; (mu4e-alert-set-default-style 'libnotify))  ; Alternative for linux
+
+  (setq mu4e-enable-mode-line t)
+
+  (setq prettier-js-args '("--bracket-spacing" "false"))
+  (setq js-indent-level 2)
+
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+
+  (add-hook 'after-change-major-mode-hook 'fci-mode)
+
+  ;; Reverse colors for the border to have nicer line
+  (set-face-inverse-video-p 'vertical-border nil)
+  (set-face-background 'vertical-border (face-background 'default))
+
+  ;; Set symbol for the border
+  (set-display-table-slot standard-display-table
+                          'vertical-border
+                          (make-glyph-code ?│))
 
   (setq dotspacemacs-elpa-https 'nil)
   (setq flyspell-issue-message-flag 'nil)
@@ -301,9 +423,10 @@ you should place your code here."
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
   (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.styl\\'" . stylus-mode))
 
   (setq-default header-line-format mode-line-format)
   (setq-default mode-line-format nil)
@@ -322,6 +445,11 @@ you should place your code here."
   (add-hook 'markdown-mode-hook 'writeroom-mode)
   (add-hook 'markdown-mode-hook 'flyspell-mode)
 
+  (defun disable-company-mode ()
+    (company-mode -1))
+
+  (add-hook 'markdown-mode-hook 'disable-company-mode)
+
   (setq processing-location "/usr/bin/processing-java")
   (setq processing-application-dir "/usr/bin/processing")
   (setq processing-sketchbook-dir "~/sketchbook")
@@ -331,7 +459,6 @@ you should place your code here."
   )
 
   (add-hook 'markdown-mode-hook 'nolinum)
-  (add-hook 'markdown-mode-hook 'visual-line-mode)
 
   (setq-default dotspacemacs-mode-line-unicode-symbols nil)
 
@@ -356,7 +483,7 @@ you should place your code here."
       (company-arduino-append-include-dirs default t)))
   (setq company-c-headers-path-system 'my-company-c-headers-get-system-path)
 
-  (global-set-key (kbd "C-s") 'helm-occur)
+  (global-set-key (kbd "C-s") 'helm-swoop)
 
   ;; Activate irony-mode on arudino-mode
   (add-hook 'arduino-mode-hook 'irony-mode)
@@ -376,6 +503,7 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(Buffer-menu-use-header-line nil)
  '(Linum-format "%7i ")
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
@@ -413,10 +541,12 @@ static char *note[] = {
 \"#######...\",
 \"######....\",
 \"#######..#\" };")))
+ '(fci-rule-character 9475)
  '(fci-rule-character-color "#202020")
- '(fci-rule-color "#3a3a3a" t)
+ '(fci-rule-color "dim gray")
  '(fringe-mode 6 nil (fringe))
  '(global-linum-mode t)
+ '(global-vi-tilde-fringe-mode nil)
  '(gnus-logo-colors (quote ("#528d8d" "#c0c0c0")) t)
  '(gnus-mode-line-image-cache
    (quote
@@ -441,6 +571,9 @@ static char *gnus-pointer[] = {
 \"###....####.######\",
 \"###..######.######\",
 \"###########.######\" };")) t)
+ '(helm-display-header-line nil)
+ '(helm-echo-input-in-header-line nil)
+ '(helm-swoop-use-line-number-face t)
  '(highlight-changes-colors (quote ("#FD5FF0" "#AE81FF")))
  '(highlight-tail-colors
    (quote
@@ -453,7 +586,7 @@ static char *gnus-pointer[] = {
      ("#F309DF" . 85)
      ("#49483E" . 100))))
  '(hl-paren-background-colors (quote ("#2492db" "#95a5a6" nil)))
- '(hl-paren-colors (quote ("#ecf0f1" "#ecf0f1" "#c0392b")) t)
+ '(hl-paren-colors (quote ("#ecf0f1" "#ecf0f1" "#c0392b")))
  '(hl-sexp-background-color "#121212")
  '(inhibit-startup-screen t)
  '(linum-format " %2d ")
@@ -480,7 +613,7 @@ static char *gnus-pointer[] = {
  '(package-enable-at-startup nil)
  '(package-selected-packages
    (quote
-    (markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+    (helm-flyspell auto-dictionary olivetti prettier-js vue-mode ssass-mode vue-html-mode column-marker column-enforce-mode synosaurus yaml-mode nginx-mode markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
  '(pos-tip-background-color "#262626")
  '(pos-tip-foreground-color "#272822")
  '(powerline-color1 "#1E1E1E")
@@ -490,6 +623,15 @@ static char *gnus-pointer[] = {
  '(processing-location "/usr/bin/processing-java" t)
  '(rainbow-identifiers-cie-l*a*b*-lightness 70)
  '(rainbow-identifiers-cie-l*a*b*-saturation 20)
+ '(safe-local-variable-values
+   (quote
+    ((eval setq org-latex-default-packages-alist
+           (cons
+            (quote
+             ("mathletters" "ucs" nil))
+            org-latex-default-packages-alist))
+     (org-latex-inputenc-alist
+      ("utf8" . "utf8x")))))
  '(sml/active-background-color "#34495e")
  '(sml/active-foreground-color "#ecf0f1")
  '(sml/inactive-background-color "#dfe4ea")
@@ -541,10 +683,15 @@ static char *gnus-pointer[] = {
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#111111" :foreground "#c6a57b" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 180 :width normal :foundry "DAMA" :family "Ubuntu Mono derivative Powerline"))))
+ '(default ((t (:inherit nil :stipple nil :background "#111111" :foreground "#c6a57b" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "ypn" :family "ypn envypn"))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
  '(fringe ((((class color) (min-colors 89)) (:foreground "#888888" :background "#111111"))))
+ '(header-line ((t (:background "#101010" :foreground "#909737" :box nil))))
+ '(helm-swoop-line-number-face ((t (:foreground "dim gray"))))
+ '(helm-swoop-target-line-block-face ((t (:background "firebrick1" :foreground "#222222"))))
+ '(helm-swoop-target-line-face ((t (:background "firebrick3" :foreground "#ffffff"))))
+ '(helm-swoop-target-word-face ((t (:background "OrangeRed1" :foreground "#ffffff"))))
  '(linum ((t (:background "#111111" :foreground "#383838"))))
  '(mode-line ((t (:background "#0e0e0e" :foreground "#c6a57b" :box nil))))
  '(mode-line-inactive ((t (:inherit mode-line :background "#0e0e0e" :foreground "#c6a57b" :box (:line-width 5 :color "#101010")))))
