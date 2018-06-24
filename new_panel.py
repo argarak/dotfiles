@@ -28,7 +28,6 @@
 #                                                                                                              #
 ################################################################################################################
 
-from daemonize import Daemonize
 from mpd import MPDClient
 from pathlib import Path
 from json import loads
@@ -39,6 +38,7 @@ import serial
 import psutil
 import time
 
+mpd_connected = True
 mpd_client = MPDClient()
 mpd_client.timeout = 10
 mpd_client.idletimeout = None
@@ -111,7 +111,7 @@ def get_mpd():
     global current_song
 
     if not mpd_client.currentsong():
-        return ""
+        return lemon_out("", "r", ACCENT_COLOR)
 
     if mpd_client.currentsong() != current_song:
         current_song = mpd_client.currentsong()
@@ -119,7 +119,13 @@ def get_mpd():
         cover_path = ""
         
         cover_dir = current_song['file']
+
         cover_dir = cover_dir[:cover_dir.rfind('/')]
+
+
+        if len(cover_dir.split(".")) > 1:
+            if cover_dir.split(".")[1] == "sid":
+                cover_dir = cover_dir[:cover_dir.rfind('/')]
 
         song_files = mpd_client.listfiles(cover_dir)
         image_types = [".jpg", ".jpeg", ".png"]
@@ -214,15 +220,18 @@ def get_clients():
     if not window_ids:
         return ""
 
-    lout = "%{c}"
+    lout = ""
 
     for i, val in enumerate(window_ids):
         title = subprocess.check_output(["xtitle", "-e", val]).decode().rstrip()
 
+        if not title or len(title) < 1:
+            continue
+
         if title[0] == "/":
             title = title.split("/")[len(title.split("/")) - 1]
 
-        title = (title[:20] + '..') if len(title) > 20 else title
+        title = (title[:30] + '..') if len(title) > 30 else title
 
         if val == current_id:
             lout += lemon_out(title, False, ACCENT_COLOR, None, ACCENT_COLOR)
@@ -274,11 +283,20 @@ def get_mail():
     global mail_state
 
     if (int(time.strftime("%M")) % 15 == 0) or (not mail_count):
-        mail = imaplib.IMAP4_SSL(keyring.get_password("mail", "address_imap_1"))
+        try:
+            mail = imaplib.IMAP4_SSL(keyring.get_password("mail", "address_imap_1"))
+        except:
+            return lemon_out(u"\ue228" + " NULL", False, PURPLE_LIGHT)
+
         address = keyring.get_password("mail", "address_1")
 
-        (retcode, capabilities) = mail.login(address,
-                                             keyring.get_password("mail", address))
+        try:
+            (retcode, capabilities) = mail.login(address,
+                                                 keyring.get_password("mail",
+                                                                      address))
+        except:
+            return lemon_out(u"\ue228" + " NULL", False, PURPLE_LIGHT)
+
         mail.list()
         mail.select('inbox')
 
@@ -298,9 +316,6 @@ def get_mail():
 
     return lemon_out(mail_state + " " + mail_count, False, PURPLE_LIGHT)
 
-def get_mail_lemonbar():
-    pass
-
 # Uncomment the bar elements you don't want but watch out, as alignment may
 # change so pass the "r", "l" or "c" parameter to lemon_out to the first bar
 # element which will be aligned, the ones after that don't need to have this
@@ -310,12 +325,12 @@ def render_panel():
 
     # Left
     current_list += get_workspaces()
-
-    # Center
     current_list += get_clients()
 
     # Right
-    current_list += get_mpd()
+    if mpd_connected:
+        current_list += get_mpd()
+
     current_list += get_current_vol()
     current_list += get_mail()
     current_list += get_cpu_usage()
@@ -326,10 +341,13 @@ def render_panel():
 
     return current_list
 
-pid = "/tmp/panel.pid"
-
 def main():
-    mpd_client.connect("localhost", 6600)
+    try:
+        mpd_client.connect("localhost", 6600)
+    except:
+        global mpd_connected
+        mpd_connected = False
+
     notify2.init("paneld")
     s = serial.Serial('/tmp/lemonbarout')
 

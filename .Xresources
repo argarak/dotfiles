@@ -1,0 +1,18 @@
+!#include "/home/kzer-za/.color3s/s3r0"
+
+Xft.antialias: 1
+Xft.autohint: 0
+Xft.dpi: 96
+Xft.hinting: 1
+Xft.hintstyle: hintfull
+Xft.lcdfilter: lcddefault
+Xft.rgba: rgb
+
+! ------------------------------------------------------------------------------
+! ROFI Color theme
+! ------------------------------------------------------------------------------
+rofi.color-enabled: true
+rofi.color-window: argb:FF0e0e0e, argb:FF0e0e0e, argb:FF0e0e0e
+rofi.color-normal: argb:FF0e0e0e, #c1c1c1, argb:FF0e0e0e, argb:FF0e0e0e, #ffffff
+rofi.color-active: argb:FF0e0e0e, #80cbc4, argb:FF0e0e0e, argb:FF0e0e0e, #80cbc4
+rofi.color-urgent: argb:FF0e0e0e, #ff1844, argb:FF0e0e0e, argb:FF0e0e0e, #ff1844
