@@ -54,7 +54,6 @@ values."
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(processing-mode
-                                      visual-fill-column
                                       wc-goal-mode
                                       arduino-mode
                                       sws-mode
@@ -69,9 +68,11 @@ values."
                                       nginx-mode
                                       yaml-mode
                                       column-enforce-mode
-                                      fill-column-indicator
                                       adaptive-wrap
-                                      prettier-js)))
+                                      prettier-js
+                                      haskell-mode
+                                      intero
+                                      emms)))
 (defun dotspacemacs/init ()
   "Initialization function.
 This function is called at the very startup of Spacemacs initialization
@@ -290,6 +291,13 @@ you should place your code here."
 
   ;; (add-hook 'org-export-before-processing-hook 'my-org-inline-css-hook)
 
+  ;; yay haskell
+  (intero-global-mode 1)
+
+  (setq org-element-use-cache nil)
+
+  (eval-after-load "org" '(require 'ox-odt nil t))
+  
   ;; set maximum indentation for description lists
   (setq org-list-description-max-indent 5)
 
@@ -374,9 +382,6 @@ you should place your code here."
   (setq js-indent-level 2)
 
   (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-
-  (add-hook 'after-change-major-mode-hook 'fci-mode)
 
   ;; Reverse colors for the border to have nicer line
   (set-face-inverse-video-p 'vertical-border nil)
@@ -392,7 +397,7 @@ you should place your code here."
 
   (setq redisplay-dont-pause t)
 
-  (require 'w3m-load)
+  ;; (require 'w3m-load)
 
   (spaceline-toggle-window-number-off)
 
@@ -406,6 +411,8 @@ you should place your code here."
 
   (require 'langtool)
   (setq langtool-language-tool-jar "/home/kzer-za/LanguageTool-3.4/languagetool-commandline.jar")
+
+  (autoload 'artist-mode "artist" "Enter artist-mode" t)
 
   (global-set-key "\C-x4w" 'langtool-check)
   (global-set-key "\C-x4W" 'langtool-check-done)
@@ -541,9 +548,9 @@ static char *note[] = {
 \"#######...\",
 \"######....\",
 \"#######..#\" };")))
- '(fci-rule-character 9475)
+ '(fci-rule-character 32)
  '(fci-rule-character-color "#202020")
- '(fci-rule-color "dim gray")
+ '(fci-rule-color "dim gray" t)
  '(fringe-mode 6 nil (fringe))
  '(global-linum-mode t)
  '(global-vi-tilde-fringe-mode nil)
@@ -571,6 +578,10 @@ static char *gnus-pointer[] = {
 \"###....####.######\",
 \"###..######.######\",
 \"###########.######\" };")) t)
+ '(haskell-interactive-popup-errors nil)
+ '(haskell-mode-hook
+   (quote
+    (haskell-indent-mode haskell-indentation-mode highlight-uses-mode interactive-haskell-mode)))
  '(helm-display-header-line nil)
  '(helm-echo-input-in-header-line nil)
  '(helm-swoop-use-line-number-face t)
@@ -613,7 +624,7 @@ static char *gnus-pointer[] = {
  '(package-enable-at-startup nil)
  '(package-selected-packages
    (quote
-    (helm-flyspell auto-dictionary olivetti prettier-js vue-mode ssass-mode vue-html-mode column-marker column-enforce-mode synosaurus yaml-mode nginx-mode markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+    (emms intero company haskell-mode helm-flyspell auto-dictionary olivetti prettier-js vue-mode ssass-mode vue-html-mode column-marker column-enforce-mode synosaurus yaml-mode nginx-mode markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
  '(pos-tip-background-color "#262626")
  '(pos-tip-foreground-color "#272822")
  '(powerline-color1 "#1E1E1E")

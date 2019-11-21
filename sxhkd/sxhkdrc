@@ -8,13 +8,16 @@ alt + Return
 
 # program launcher
 alt + p
-	rofi -sidebar-mode -show Drun -line 3 -eh 2 -width 25% -padding 25% -opacity "100" -font "Terminess Powerline 9" -no-disable-history -no-levenshtein-sort -only-match
+	rofi -sidebar-mode -show drun -line 1 -eh 1 -width 25% -padding 25% -opacity "50" -font "ypn envypn 9" -no-disable-history -no-levenshtein-sort -only-match
+
+alt + super + p
+  rofi -show pstate -modi pstate:~/work/pstate.sh -line 3 -eh 2 -width 20% -padding 25% -opacity "100" -font "ypn envypn 9" -no-levenshtein-sort -only-match
 
 alt + r
-  rofi -show run -lines2 1 -eh 2 -width 25% -padding 25% -opacity "100" -font "Terminess Powerline 9"
+  rofi -show run -lines2 1 -eh 2 -width 20% -padding 25% -opacity "100" -font "ypn envypn 9"
 
-Menu
-  rofi -sidebar-mode -show window -line 3 -eh 2 -width 25% -padding 25% -opacity "100" -font "Terminess Powerline 9" -no-disable-history -no-levenshtein-sort -only-match
+ctrl + Menu
+  rofi -show window -line 3 -eh 2 -width 20% -padding 25% -opacity "100" -font "ypn envypn 9" -no-disable-history -no-levenshtein-sort -only-match
 
 # make sxhkd reload its configuration files:
 super + Escape
@@ -30,7 +33,7 @@ super + alt + Escape
 
 # close and kill
 alt + c
-	bspc node -{c,k}
+	bspc node -c
 
 # alternate between the tiled and monocle layout
 super + m
@@ -74,17 +77,14 @@ super + {_,shift + }n
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
-  python ~/panel.py >> /tmp/lemonbarout &; \
 	bspc desktop -f {prev,next}.local
 
 # focus the last node/desktop
 super + {grave,Tab}
-  python ~/panel.py >> /tmp/lemonbarout &;\
 	bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
 super + {o,i}
-  python ~/panel.py >> /tmp/lemonbarout &; \
 	bspc wm -h off; \
 	bspc node {older,newer} -f; \
 	bspc wm -h on
@@ -94,7 +94,6 @@ super + j
 
 # focus or send to the given desktop
 alt + {_,shift + }{1-9,0}
-  python ~/panel.py >> /tmp/lemonbarout &; \
   bspc {desktop -f,node -d} '^{1-9,10}'
 
 #
@@ -133,20 +132,39 @@ super + alt + shift + {h,j,k,l}
 super + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
-super + ctrl + Up
+#super + ctrl + Up
+XF86AudioPlay
   mpc toggle
 
-super + ctrl + Right
+#super + ctrl + Right
+XF86AudioNext
   mpc next
 
-super + ctrl + Left
+#super + ctrl + Left
+XF86AudioPrev
   mpc prev
 
-super + ctrl + Down
+#super + ctrl + Down
+XF86AudioStop
   mpc stop
 
 super + Home
-  amixer -q sset Master 5%+
+  pulsemixer --change-volume +5
 
 super + End
-  amixer -q sset Master 5%-
+  pulsemixer --change-volume -5
+
+XF86AudioRaiseVolume
+  pulsemixer --change-volume +1
+
+XF86AudioLowerVolume
+  pulsemixer --change-volume -1
+
+XF86AudioMute
+  pulsemixer --toggle-mute
+
+alt + Pause
+  locknow
+
+super + ctrl + s
+  gscreenshot

@@ -46,12 +46,12 @@ mpd_client.idletimeout = None
 # Change this if MPD music is in another directory
 MUSIC_DIRECTORY=str(Path.home()) + "/Music"
 
-ACCENT_COLOR="#c62828"
-ACCENT_DARK="#b71c1c"
+ACCENT_COLOR="#888888"
+ACCENT_DARK="#444444"
 ACCENT_SUB_LIGHT="#d32f2f"
 TEXT_COLOR="#E7E7E7"
-PINK="#ef9a9a"
-PINK_DARK="#ef5350"
+PINK="#222222"
+PINK_DARK="#555555"
 PINK_MID="#c62828"
 PURPLE="#9C27B0"
 PURPLE_DARK="#4A148C"
@@ -101,7 +101,7 @@ dump_list = get_dump_list()
 
 def get_date():
     return lemon_out(u"\ue26a" + " " + time.strftime(date_format), False, ACCENT_DARK)
-
+ 
 def get_time():
     return lemon_out(u"\ue017" + " " + time.strftime(time_format))
 
@@ -117,7 +117,7 @@ def get_mpd():
         current_song = mpd_client.currentsong()
 
         cover_path = ""
-        
+
         cover_dir = current_song['file']
 
         cover_dir = cover_dir[:cover_dir.rfind('/')]
@@ -200,7 +200,7 @@ def get_workspaces():
 
     for i in desktops:
         if currently_focused == i["id"]:
-            lout += lemon_out(i["name"], False, PINK_MID, "#000000")
+            lout += lemon_out(i["name"], False, "#ffffff", "#ffffff")
         elif i["root"] != None:
             lout += lemon_out(i["name"], False, PINK_DARK)
         else:
@@ -265,7 +265,7 @@ def get_current_vol():
 
     return lemon_out(state + " " + str(volume) + "%", False, PURPLE)
 
-import keyring
+#import keyring
 import imaplib
 
 mail_count = ""
@@ -278,43 +278,43 @@ mail_state = ""
 # keyring set mail address_1 <user@host.tld>
 # keyring set mail <user@host.tld> <password for email>
 #
-def get_mail():
-    global mail_count
-    global mail_state
+# def get_mail():
+#     global mail_count
+#     global mail_state
 
-    if (int(time.strftime("%M")) % 15 == 0) or (not mail_count):
-        try:
-            mail = imaplib.IMAP4_SSL(keyring.get_password("mail", "address_imap_1"))
-        except:
-            return lemon_out(u"\ue228" + " NULL", False, PURPLE_LIGHT)
+#     if (int(time.strftime("%M")) % 15 == 0) or (not mail_count):
+#         try:
+#             mail = imaplib.IMAP4_SSL(keyring.get_password("mail", "address_imap_1"))
+#         except:
+#             return lemon_out(u"\ue228" + " NULL", False, PURPLE_LIGHT)
 
-        address = keyring.get_password("mail", "address_1")
+#         address = keyring.get_password("mail", "address_1")
 
-        try:
-            (retcode, capabilities) = mail.login(address,
-                                                 keyring.get_password("mail",
-                                                                      address))
-        except:
-            return lemon_out(u"\ue228" + " NULL", False, PURPLE_LIGHT)
+#         try:
+#             (retcode, capabilities) = mail.login(address,
+#                                                  keyring.get_password("mail",
+#                                                                       address))
+#         except:
+#             return lemon_out(u"\ue228" + " NULL", False, PURPLE_LIGHT)
 
-        mail.list()
-        mail.select('inbox')
+#         mail.list()
+#         mail.select('inbox')
 
-        (retcode, messages) = mail.search(None, '(UNSEEN)')
+#         (retcode, messages) = mail.search(None, '(UNSEEN)')
 
-        mail_count = str(len(messages[0].split()))
+#         mail_count = str(len(messages[0].split()))
 
-        if len(messages[0].split()) > 0:
-            mail_state = u"\ue229"
-        else:
-            mail_state = u"\ue228"
+#         if len(messages[0].split()) > 0:
+#             mail_state = u"\ue229"
+#         else:
+#             mail_state = u"\ue228"
 
-        if retcode == 'OK':
-            return lemon_out(mail_count, False, PURPLE_LIGHT)
-        else:
-            return lemon_out("null", False, PURPLE_LIGHT)
+#         if retcode == 'OK':
+#             return lemon_out(mail_count, False, PURPLE_LIGHT)
+#         else:
+#             return lemon_out("null", False, PURPLE_LIGHT)
 
-    return lemon_out(mail_state + " " + mail_count, False, PURPLE_LIGHT)
+#     return lemon_out(mail_state + " " + mail_count, False, PURPLE_LIGHT)
 
 # Uncomment the bar elements you don't want but watch out, as alignment may
 # change so pass the "r", "l" or "c" parameter to lemon_out to the first bar
@@ -332,7 +332,7 @@ def render_panel():
         current_list += get_mpd()
 
     current_list += get_current_vol()
-    current_list += get_mail()
+    #current_list += get_mail()
     current_list += get_cpu_usage()
     current_list += get_temps()
     current_list += get_date()

@@ -11,6 +11,7 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
   unset f
 fi
 
+export DESKTOP_SESSION=gnome
 xrdb -merge ~/.Xresources
 
 monitor-config &
@@ -20,6 +21,10 @@ setxkbmap -layout dvorak
 mpd .mpd &
 #/usr/bin/emacs --daemon &
 redshift -l geoclue &
+nitrogen --restore
+
+xset +fp /home/kzer-za/.fonts &
+xset fp rehash &
 
 sxhkd &
 #exec awesome
@@ -27,3 +32,4 @@ compton &
 #exec qtile
 #exec wmaker
 exec bspwm
+#gnome-session

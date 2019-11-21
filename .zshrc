@@ -91,7 +91,8 @@ alias yaourt="/home/kzer-za/apacman/apacman --noconfirm"
 alias dd="echo try using pv"
 alias asdf="setxkbmap -layout dvorak"
 alias cups_print="lp -d Photosmart_C4400_Recent"
-alias y="yaourt"
+alias ap="apacman"
+alias venv="virtualenv"
 eval "$(thefuck --alias fuck)"
 
 if [ -f ~/.dir_colors ]; then
@@ -105,3 +106,10 @@ function project() {
   A=$1
   cd ~/work/${A}
 }
+
+export SDL_VIDEO_X11_DGAMOUSE=0
+
+PATH="$HOME/.node/bin:$PATH"  
+NODE_PATH="$HOME/.node/lib/node_modules:$NODE_PATH"
+MANPATH="$HOME/.node/share/man:$MANPATH"
+export QT_STYLE_OVERRIDE=kvantum
