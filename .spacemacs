@@ -18,6 +18,7 @@ values."
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
+     csv
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -72,7 +73,10 @@ values."
                                       prettier-js
                                       haskell-mode
                                       intero
-                                      emms)))
+                                      emms
+                                      org-ref
+                                      writeroom-mode
+                                      realgud)))
 (defun dotspacemacs/init ()
   "Initialization function.
 This function is called at the very startup of Spacemacs initialization
@@ -296,8 +300,6 @@ you should place your code here."
 
   (setq org-element-use-cache nil)
 
-  (eval-after-load "org" '(require 'ox-odt nil t))
-  
   ;; set maximum indentation for description lists
   (setq org-list-description-max-indent 5)
 
@@ -310,73 +312,6 @@ you should place your code here."
 
   ;; prevent demoting heading also shifting text inside sections
   (setq org-adapt-indentation nil)
-
-  (fset 'init-wiki-table
-   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([134217848 114 101 112 108 97 99 101 45 115 116 114 105 110 103 return 70 105 108 101 58 return 109 101 100 105 97 58 return escape 60 return return up up 123 124 32 99 108 97 115 115 61 34 34 left 119 105 107 105 116 97 98 108 101 right return 124 45 return 33 32 115 99 111 112 101 61 34 34 left 99 111 108 right 124 32 78 97 119 101 return 33 32 115 99 111 112 101 61 34 99 111 108 34 124 32 85 82 76 up backspace 109 down return 124 45 return 124 32 115 99 111 112 101 61 34 34 left 114 111 119 right 124 32 86 105 115 backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace backspace down backspace down 1 124 32 down 1 up return up 124 32 115 99 111 112 101 61 34 34 left 114 111 119 right 124 down 1 right right right right right right right right right right 67108896 5 left left left left left left 134217847 up 32 25 down 5 left left 124 80 68 70 5 return 124 45] 0 "%d")) arg)))
-
-  (add-to-list 'load-path "~/.emacs.d/mu4e-multi/")
-  (require 'mu4e-multi)
-
-  (setq mu4e-maildir "/home/kzer-za/mail")
-
-  (setq mu4e-account-alist
-        '(("cryptolab"
-           ;; Under each account, set the account-specific variables you want.
-           (mu4e-sent-messages-behavior sent)
-           (mu4e-sent-folder "/cryptolab/sent")
-           (mu4e-drafts-folder "/cryptolab/drafts")
-           (mu4e-trash-folder  "/cryptolab/deleted")
-           (mu4e-refile-folder "/cryptolab/archive")
-           (user-mail-address "kzer-za@cryptolab.net")
-           (user-full-name "Jakub Kukielka"))
-          ("privateemail"
-           (mu4e-sent-messages-behavior sent)
-           (mu4e-sent-folder "/privateemail/sent")
-           (mu4e-drafts-folder "/privateemail/drafts")
-           (mu4e-trash-folder  "/privateemail/deleted")
-           (mu4e-refile-folder "/privateemail/archive")
-           (user-mail-address "contact@argarak.me")
-           (user-full-name "Jakub Kukielka"))))
-  (mu4e/mail-account-reset)
-
-  (mu4e-multi-enable)
-
-  ;;; Set up some common mu4e variables
-  (setq mu4e-maildir "~/.mail"
-        mu4e-trash-folder "/Trash"
-        mu4e-refile-folder "/Archive"
-        mu4e-get-mail-command "mbsync -a"
-        mu4e-update-interval nil
-        mu4e-compose-signature-auto-include nil
-        mu4e-view-show-images t
-        mu4e-view-show-addresses t)
-
-  ;;; Mail directory shortcuts
-  (setq mu4e-maildir-shortcuts
-        '(("/gmail/INBOX" . ?g)
-          ("/college/INBOX" . ?c)))
-
-  ;;; Bookmarks
-  (setq mu4e-bookmarks
-        `(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-          ("date:today..now" "Today's messages" ?t)
-          ("date:7d..now" "Last 7 days" ?w)
-          ("mime:image/*" "Messages with images" ?p)
-          (,(mapconcat 'identity
-                       (mapcar
-                        (lambda (maildir)
-                          (concat "maildir:" (car maildir)))
-                        mu4e-maildir-shortcuts) " OR ")
-           "All inboxes" ?i)))
-
-  (setq mu4e-enable-notifications t)
-
-  (with-eval-after-load 'mu4e-alert
-    ;; Enable Desktop notifications
-    (mu4e-alert-set-default-style 'notifications)) ; For linux
-    ;; (mu4e-alert-set-default-style 'libnotify))  ; Alternative for linux
-
-  (setq mu4e-enable-mode-line t)
 
   (setq prettier-js-args '("--bracket-spacing" "false"))
   (setq js-indent-level 2)
@@ -404,24 +339,7 @@ you should place your code here."
   (setq powerline-default-separator 'nil)
   (setq linum-format " %d ")
 
-  (add-to-list 'load-path "~/.emacs.d/smart-quotes/")
-
-  (require 'smart-quotes)
-  (add-hook 'markdown-mode-hook 'turn-on-smart-quotes)
-
-  (require 'langtool)
-  (setq langtool-language-tool-jar "/home/kzer-za/LanguageTool-3.4/languagetool-commandline.jar")
-
   (autoload 'artist-mode "artist" "Enter artist-mode" t)
-
-  (global-set-key "\C-x4w" 'langtool-check)
-  (global-set-key "\C-x4W" 'langtool-check-done)
-  (global-set-key "\C-x4l" 'langtool-switch-default-language)
-  (global-set-key "\C-x44" 'langtool-show-message-at-point)
-  (global-set-key "\C-x4c" 'langtool-correct-buffer)
-
-  (setq langtool-default-language "en-GB")
-  (setq langtool-java-bin "/usr/bin/java")
 
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -439,12 +357,8 @@ you should place your code here."
   (setq-default mode-line-format nil)
 
   (require 'sws-mode)
-  (require 'jade-mode)
 
   (add-to-list 'auto-mode-alist '("\\.styl\\'" . sws-mode))
-
-  ;;(add-to-list 'default-frame-alist '(font . "Roboto Mono-12" ))
-  ;;(set-face-attribute 'default t :font "Roboto Mono-12" )
 
   (set-face-attribute 'default nil :height 180)
 
@@ -452,8 +366,8 @@ you should place your code here."
   (add-hook 'markdown-mode-hook 'writeroom-mode)
   (add-hook 'markdown-mode-hook 'flyspell-mode)
 
-  (defun disable-company-mode ()
-    (company-mode -1))
+  ;; (defun disable-company-mode ()
+  ;;   (company-mode -1))
 
   (add-hook 'markdown-mode-hook 'disable-company-mode)
 
@@ -474,29 +388,10 @@ you should place your code here."
               (make-local-variable 'face-remapping-alist)
               (add-to-list 'face-remapping-alist '(default (:background "#111111")))))
 
-  ;; Configuration for irony.el
-  ;; Add arduino's include options to irony-mode's variable.
-  (add-hook 'irony-mode-hook 'company-arduino-turn-on)
-
-  ;; Configuration for company-c-headers.el
-  ;; The `company-arduino-append-include-dirs' function appends
-  ;; Arduino's include directories to the default directories
-  ;; if `default-directory' is inside `company-arduino-home'. Otherwise
-  ;; just returns the default directories.
-  ;; Please change the default include directories accordingly.
-  (defun my-company-c-headers-get-system-path ()
-    "Return the system include path for the current buffer."
-    (let ((default '("/usr/include/" "/usr/local/include/")))
-      (company-arduino-append-include-dirs default t)))
-  (setq company-c-headers-path-system 'my-company-c-headers-get-system-path)
-
   (global-set-key (kbd "C-s") 'helm-swoop)
+  (global-set-key (kbd "M-s s") 'replace-string)
 
-  ;; Activate irony-mode on arudino-mode
-  (add-hook 'arduino-mode-hook 'irony-mode)
-
-  (add-to-list 'load-path "~/.emacs.d/impatient-mode")
-  (require 'impatient-mode)
+  (require 'org-ref)
 
   ;; End of config
   (spaceline-compile)
@@ -520,16 +415,14 @@ you should place your code here."
    [unspecified "#272822" "#f92672" "#a6e22e" "#f4bf75" "#66d9ef" "#ae81ff" "#66d9ef" "#f8f8f2"] t)
  '(async-bytecomp-package-mode t)
  '(blink-cursor-mode nil)
- '(compilation-message-face (quote default))
- '(cursor-type (quote bar))
- '(custom-enabled-themes (quote (jazz)))
+ '(compilation-message-face 'default)
+ '(cursor-type 'bar)
+ '(custom-enabled-themes '(jazz))
  '(custom-safe-themes
-   (quote
-    ("12ced60b9eec2ec25d781a556c1ecf2c582700439f56ca18c281b3fb7670e5e6" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "8936325181ad91e3c0a4292f9912fa28da358c159b5dae2af3728bbcfa07ae9e" "e03bebe267c8599b02112a1aa7f9a0ab0a2f47048bfb6a8ab67bd9e1a44085c4" "c39ae5721fce3a07a27a685c08e4b856a13780dbc755a569bb4393c932f226d7" default)))
- '(diary-entry-marker (quote font-lock-variable-name-face))
+   '("eb7be1648009af366d83f855191057bdc09348a2d9353db31da03b1cdec50cc5" "12ced60b9eec2ec25d781a556c1ecf2c582700439f56ca18c281b3fb7670e5e6" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "8936325181ad91e3c0a4292f9912fa28da358c159b5dae2af3728bbcfa07ae9e" "e03bebe267c8599b02112a1aa7f9a0ab0a2f47048bfb6a8ab67bd9e1a44085c4" "c39ae5721fce3a07a27a685c08e4b856a13780dbc755a569bb4393c932f226d7" default))
+ '(diary-entry-marker 'font-lock-variable-name-face)
  '(emms-mode-line-icon-image-cache
-   (quote
-    (image :type xpm :ascent center :data "/* XPM */
+   '(image :type xpm :ascent center :data "/* XPM */
 static char *note[] = {
 /* width height num_colors chars_per_pixel */
 \"    10   11        2            1\",
@@ -547,17 +440,17 @@ static char *note[] = {
 \"#..######.\",
 \"#######...\",
 \"######....\",
-\"#######..#\" };")))
+\"#######..#\" };"))
+ '(evil-want-Y-yank-to-eol t)
  '(fci-rule-character 32)
  '(fci-rule-character-color "#202020")
  '(fci-rule-color "dim gray" t)
  '(fringe-mode 6 nil (fringe))
  '(global-linum-mode t)
  '(global-vi-tilde-fringe-mode nil)
- '(gnus-logo-colors (quote ("#528d8d" "#c0c0c0")) t)
+ '(gnus-logo-colors '("#528d8d" "#c0c0c0") t)
  '(gnus-mode-line-image-cache
-   (quote
-    (image :type xpm :ascent center :data "/* XPM */
+   '(image :type xpm :ascent center :data "/* XPM */
 static char *gnus-pointer[] = {
 /* width height num_colors chars_per_pixel */
 \"    18    13        2            1\",
@@ -577,27 +470,25 @@ static char *gnus-pointer[] = {
 \"######..###.######\",
 \"###....####.######\",
 \"###..######.######\",
-\"###########.######\" };")) t)
+\"###########.######\" };") t)
  '(haskell-interactive-popup-errors nil)
  '(haskell-mode-hook
-   (quote
-    (haskell-indent-mode haskell-indentation-mode highlight-uses-mode interactive-haskell-mode)))
- '(helm-display-header-line nil)
- '(helm-echo-input-in-header-line nil)
+   '(haskell-indent-mode haskell-indentation-mode highlight-uses-mode interactive-haskell-mode))
+ '(helm-display-header-line nil t)
+ '(helm-echo-input-in-header-line nil t)
  '(helm-swoop-use-line-number-face t)
- '(highlight-changes-colors (quote ("#FD5FF0" "#AE81FF")))
+ '(highlight-changes-colors '("#FD5FF0" "#AE81FF"))
  '(highlight-tail-colors
-   (quote
-    (("#49483E" . 0)
+   '(("#49483E" . 0)
      ("#679A01" . 20)
      ("#4BBEAE" . 30)
      ("#1DB4D0" . 50)
      ("#9A8F21" . 60)
      ("#A75B00" . 70)
      ("#F309DF" . 85)
-     ("#49483E" . 100))))
- '(hl-paren-background-colors (quote ("#2492db" "#95a5a6" nil)))
- '(hl-paren-colors (quote ("#ecf0f1" "#ecf0f1" "#c0392b")))
+     ("#49483E" . 100)))
+ '(hl-paren-background-colors '("#2492db" "#95a5a6" nil))
+ '(hl-paren-colors '("#ecf0f1" "#ecf0f1" "#c0392b") t)
  '(hl-sexp-background-color "#121212")
  '(inhibit-startup-screen t)
  '(linum-format " %2d ")
@@ -605,26 +496,23 @@ static char *gnus-pointer[] = {
  '(magit-diff-use-overlays nil)
  '(main-line-color1 "#1E1E1E")
  '(main-line-color2 "#111111")
- '(main-line-separator-style (quote chamfer))
+ '(main-line-separator-style 'chamfer)
  '(menu-bar-mode nil)
  '(notmuch-search-line-faces
-   (quote
-    (("unread" :foreground "#aeee00")
+   '(("unread" :foreground "#aeee00")
      ("flagged" :foreground "#0a9dff")
-     ("deleted" :foreground "#ff2c4b" :bold t))))
+     ("deleted" :foreground "#ff2c4b" :bold t)))
  '(nrepl-message-colors
-   (quote
-    ("#336c6c" "#205070" "#0f2050" "#806080" "#401440" "#6c1f1c" "#6b400c" "#23733c")))
- '(org-bullets-bullet-list (quote ("‣" "•" "◦" "⁃")))
+   '("#336c6c" "#205070" "#0f2050" "#806080" "#401440" "#6c1f1c" "#6b400c" "#23733c"))
+ '(org-agenda-files '("~/work/eeng/aaaaaaaaaaaaa.org"))
+ '(org-bullets-bullet-list '("‣" "•" "◦" "⁃"))
  '(package-archives
-   (quote
-    (("marmalade" . "https://marmalade-repo.org/packages/")
+   '(("marmalade" . "https://marmalade-repo.org/packages/")
      ("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa" . "https://melpa.org/packages/"))))
+     ("melpa" . "https://melpa.org/packages/")))
  '(package-enable-at-startup nil)
  '(package-selected-packages
-   (quote
-    (emms intero company haskell-mode helm-flyspell auto-dictionary olivetti prettier-js vue-mode ssass-mode vue-html-mode column-marker column-enforce-mode synosaurus yaml-mode nginx-mode markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+   '(realgud test-simple loc-changes load-relative visual-fill-column csv-mode org-projectile org-plus-contrib yapfify winum uuidgen unfill sws-mode powerline py-isort pug-mode org-category-capture org-mime org-download mwim mu4e-maildirs-extension mu4e-alert alert log4e gntp markdown-mode magit-popup livid-mode skewer-mode live-py-mode link-hint json-snatcher json-reformat yasnippet multiple-cursors js2-mode insert-shebang impatient-mode hydra dash-functional parent-mode projectile haml-mode github-search gh marshal logito pcache ht flyspell-correct-helm flyspell-correct pos-tip flycheck pkg-info epl flx eyebrowse evil-visual-mark-mode evil-unimpaired highlight magit git-commit with-editor transient smartparens iedit evil-ediff anzu evil goto-chg undo-tree dumb-jump diminish color-identifiers-mode bind-map bind-key packed auctex arduino-mode spinner anaconda-mode pythonic f dash s helm avy helm-core popup async org-ref pdf-tools key-chord ivy helm-bibtex biblio parsebib biblio-core lv tablist emms intero company haskell-mode helm-flyspell auto-dictionary olivetti prettier-js vue-mode ssass-mode vue-html-mode column-marker column-enforce-mode synosaurus yaml-mode nginx-mode markdown-mode+ simple-httpd helm-gitignore request ws-butler writeroom-mode which-key web-mode web-beautify wc-goal-mode volatile-highlights vi-tilde-fringe use-package toc-org tagedit stylus-mode spacemacs-theme spaceline smooth-scrolling smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-yapf processing-mode popwin pip-requirements persp-mode pcre2el paradox page-break-lines orgit org-repo-todo org-present org-pomodoro org-bullets open-junk-file neotree move-text mmm-mode minimap markdown-toc magit-gitflow magit-gh-pulls macrostep lua-mode lorem-ipsum linum-relative leuven-theme less-css-mode latex-preview-pane json-mode js2-refactor js-doc jazz-theme jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md ggtags flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav disaster define-word cython-mode company-web company-tern company-statistics company-quickhelp company-auctex company-arduino company-anaconda coffee-mode cmake-mode clean-aindent-mode clang-format buffer-move bracketed-paste auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))
  '(pos-tip-background-color "#262626")
  '(pos-tip-foreground-color "#272822")
  '(powerline-color1 "#1E1E1E")
@@ -632,17 +520,15 @@ static char *gnus-pointer[] = {
  '(powerline-default-separator nil)
  '(processing-application-dir "/usr/bin/processing" t)
  '(processing-location "/usr/bin/processing-java" t)
- '(rainbow-identifiers-cie-l*a*b*-lightness 70)
- '(rainbow-identifiers-cie-l*a*b*-saturation 20)
+ '(rainbow-identifiers-cie-l*a*b*-lightness 70 t)
+ '(rainbow-identifiers-cie-l*a*b*-saturation 20 t)
  '(safe-local-variable-values
-   (quote
-    ((eval setq org-latex-default-packages-alist
+   '((eval setq org-latex-default-packages-alist
            (cons
-            (quote
-             ("mathletters" "ucs" nil))
+            '("mathletters" "ucs" nil)
             org-latex-default-packages-alist))
      (org-latex-inputenc-alist
-      ("utf8" . "utf8x")))))
+      ("utf8" . "utf8x"))))
  '(sml/active-background-color "#34495e")
  '(sml/active-foreground-color "#ecf0f1")
  '(sml/inactive-background-color "#dfe4ea")
@@ -652,8 +538,7 @@ static char *gnus-pointer[] = {
  '(use-package-inject-hooks t)
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
-   (quote
-    ((20 . "#f36c60")
+   '((20 . "#f36c60")
      (40 . "#ff9800")
      (60 . "#fff59d")
      (80 . "#8bc34a")
@@ -670,15 +555,14 @@ static char *gnus-pointer[] = {
      (300 . "#f36c60")
      (320 . "#ff9800")
      (340 . "#fff59d")
-     (360 . "#8bc34a"))))
+     (360 . "#8bc34a")))
  '(vc-annotate-very-old-color nil)
  '(weechat-color-list
    (unspecified "#272822" "#49483E" "#F70057" "#F92672" "#86C30D" "#A6E22E" "#BEB244" "#E6DB74" "#40CAE4" "#66D9EF" "#FB35EA" "#FD5FF0" "#74DBCD" "#A1EFE4" "#F8F8F2" "#F8F8F0"))
  '(when
       (or
        (not
-        (boundp
-         (quote ansi-term-color-vector)))
+        (boundp 'ansi-term-color-vector))
        (not
         (facep
          (aref ansi-term-color-vector 0)))))
