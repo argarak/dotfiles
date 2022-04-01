@@ -4,20 +4,20 @@
 
 # terminal emulator
 alt + Return
-  termite
+  alacritty
 
 # program launcher
 alt + p
-	rofi -sidebar-mode -show drun -line 1 -eh 1 -width 25% -padding 25% -opacity "50" -font "ypn envypn 9" -no-disable-history -no-levenshtein-sort -only-match
+	rofi -sidebar-mode -show drun -line 2 -eh 1.3 -width 20% -font "GohuNew 9" -no-disable-history -no-levenshtein-sort -only-match
 
 alt + super + p
   rofi -show pstate -modi pstate:~/work/pstate.sh -line 3 -eh 2 -width 20% -padding 25% -opacity "100" -font "ypn envypn 9" -no-levenshtein-sort -only-match
 
 alt + r
-  rofi -show run -lines2 1 -eh 2 -width 20% -padding 25% -opacity "100" -font "ypn envypn 9"
+  rofi -show run -lines2 1 -eh 2 -width 20% -padding 25% -opacity "100" -font "GohuNew 9"
 
 ctrl + Menu
-  rofi -show window -line 3 -eh 2 -width 20% -padding 25% -opacity "100" -font "ypn envypn 9" -no-disable-history -no-levenshtein-sort -only-match
+  rofi -show window -line 2 -eh 1.3 -width 20% -opacity "100" -font "GohuNew 9" -no-disable-history -no-levenshtein-sort -only-match
 
 # make sxhkd reload its configuration files:
 super + Escape
@@ -64,8 +64,8 @@ super + ctrl + {x,y,z}
 #
 
 # focus the node in the given direction
-super + {_,shift + }{h,j,k,l}
-	bspc node -{f,s} {west,south,north,east}
+#super + {_,shift + }{h,t,n,s}
+#	bspc node -{f,s} {west,south,north,east}
 
 # focus the node for the given path jump
 super + {p,b,comma,period}
@@ -121,11 +121,11 @@ super + ctrl + shift + space
 #
 
 # expand a window by moving one of its side outward
-super + alt + {h,j,k,l}
+super + alt + {Left,Down,Up,Right}
 	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
 
 # contract a window by moving one of its side inward
-super + alt + shift + {h,j,k,l}
+super + alt + shift + {Left,Down,Up,Right}
 	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
 
 # move a floating window
@@ -168,3 +168,21 @@ alt + Pause
 
 super + ctrl + s
   gscreenshot
+
+super + e
+  emacsclient -a '' -qc "$@"
+
+super + ctrl + p
+  pasuspender /bin/true
+
+alt + ctrl + s
+  screensend
+
+alt + super + s
+  screenshot
+
+ctrl + End
+  setxkbmap -layout us
+
+ctrl + Home
+  setxkbmap -layout dvorak

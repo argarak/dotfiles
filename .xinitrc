@@ -14,13 +14,13 @@ fi
 export DESKTOP_SESSION=gnome
 xrdb -merge ~/.Xresources
 
-monitor-config &
+monitorsetup &
 #xscreensaver -no-splash &  
 xsetroot -cursor_name left_ptr    
 setxkbmap -layout dvorak
 mpd .mpd &
 #/usr/bin/emacs --daemon &
-redshift -l geoclue &
+#redshift -l geoclue &
 nitrogen --restore
 
 xset +fp /home/kzer-za/.fonts &
@@ -28,8 +28,11 @@ xset fp rehash &
 
 sxhkd &
 #exec awesome
-compton &
+picom --config ~/.picom.conf &
+ckb-next -b &
 #exec qtile
 #exec wmaker
 exec bspwm
 #gnome-session
+#exec fluxbox
+#exec startplasma-x11

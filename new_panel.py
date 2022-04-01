@@ -54,10 +54,10 @@ PINK="#222222"
 PINK_DARK="#555555"
 PINK_MID="#c62828"
 PURPLE="#9C27B0"
-PURPLE_DARK="#4A148C"
-PURPLE_MID1="#6A1B9A"
-PURPLE_MID2="#7B1FA2"
-PURPLE_LIGHT="#AB47BC"
+PURPLE_DARK="#b71c1c"
+PURPLE_MID1="#b71c1c"
+PURPLE_MID2="#b71c1c"
+PURPLE_LIGHT="#b71c1c"
 
 date_format = "%a %b %d"
 time_format = "%H:%M"
@@ -72,6 +72,8 @@ def lemon_out(data, direction=False, bcolor=ACCENT_COLOR, fcolor=None, underline
             ucolor += "0"
         else:
             ucolor += bcolor[i]
+
+    ucolor = bcolor
 
     if underline:
         lout += "%{+u}"
@@ -101,13 +103,16 @@ dump_list = get_dump_list()
 
 def get_date():
     return lemon_out(u"\ue26a" + " " + time.strftime(date_format), False, ACCENT_DARK)
- 
+
 def get_time():
     return lemon_out(u"\ue017" + " " + time.strftime(time_format))
 
 current_song = {}
 
-def get_mpd():
+def get_mpd(monitor):
+    if monitor == 0:
+        return ""
+
     global current_song
 
     if not mpd_client.currentsong():
@@ -127,16 +132,20 @@ def get_mpd():
             if cover_dir.split(".")[1] == "sid":
                 cover_dir = cover_dir[:cover_dir.rfind('/')]
 
-        song_files = mpd_client.listfiles(cover_dir)
-        image_types = [".jpg", ".jpeg", ".png"]
+        try:
+            song_files = mpd_client.listfiles(cover_dir)
+            image_types = [".jpg", ".jpeg", ".png"]
 
-        for song_file in song_files:
-            file_type = ""
-            if 'file' in song_file:
-                file_type = song_file['file'][song_file['file'].rfind('.'):]
+            for song_file in song_files:
+                file_type = ""
+                if 'file' in song_file:
+                    file_type = song_file['file'][song_file['file'].rfind('.'):]
 
-            if file_type in image_types:
-                cover_path = MUSIC_DIRECTORY + "/" + cover_dir + "/" + song_file['file']
+                if file_type in image_types:
+                    cover_path = MUSIC_DIRECTORY + "/" + cover_dir + "/" + song_file['file']
+        except:
+            # silently continue if cover cannot be found, e.g. for internet streams
+            cover_path = ""
 
         artist = ""
         if 'artist' in current_song:
@@ -191,11 +200,12 @@ def get_mpd():
     else:
         return lemon_out("", "r", ACCENT_COLOR)
 
-def get_workspaces():
+def get_workspaces(monitor):
+    dump_list = get_dump_list()
     lout = "%{l}"
 
     # Support for one monitor atm
-    desktops = dump_list["monitors"][0]["desktops"]
+    desktops = dump_list["monitors"][monitor]["desktops"]
     currently_focused = int(subprocess.check_output(["bspc", "query", "--desktops", "--desktop", "focused"]).decode().rstrip(), 16)
 
     for i in desktops:
@@ -255,6 +265,7 @@ def get_current_vol():
     m = alsaaudio.Mixer()
     volume = m.getvolume()[0]
     state = ""
+
 
     if volume > 50:
         state = u"\ue05d"
@@ -320,23 +331,27 @@ mail_state = ""
 # change so pass the "r", "l" or "c" parameter to lemon_out to the first bar
 # element which will be aligned, the ones after that don't need to have this
 # parameter after that.
-def render_panel():
+def render_panel(monitor):
     current_list = ""
 
     # Left
-    current_list += get_workspaces()
-    current_list += get_clients()
+    current_list += get_workspaces(monitor)
+
+    if monitor == 0:
+        current_list += get_clients()
 
     # Right
     if mpd_connected:
-        current_list += get_mpd()
+        current_list += get_mpd(monitor)
 
-    current_list += get_current_vol()
+    #current_list += get_current_vol()
     #current_list += get_mail()
-    current_list += get_cpu_usage()
-    current_list += get_temps()
-    current_list += get_date()
-    current_list += get_time()
+
+    if monitor == 1:
+        current_list += get_cpu_usage()
+        current_list += get_temps()
+        current_list += get_date()
+        current_list += get_time()
 
 
     return current_list
@@ -351,12 +366,20 @@ def main():
     notify2.init("paneld")
     s = serial.Serial('/tmp/lemonbarout')
 
+    # second monitor
+    s2 = serial.Serial('/tmp/lemonbarout2')
+
     while True:
-        s.write(render_panel().encode() + "\r\n".encode())
+        s.write(render_panel(0).encode() + "\r\n".encode())
+        s2.write(render_panel(1).encode() + "\r\n".encode())
         time.sleep(1)
 
 if __name__ == '__main__':
     mpd_client.connect("localhost", 6600)
     notify2.init("paneld")
+
     s = serial.Serial('/tmp/lemonbarout')
-    s.write(render_panel().encode() + "\r\n".encode())
+    s2 = serial.Serial('/tmp/lemonbarout2')
+
+    s.write(render_panel(0).encode() + "\r\n".encode())
+    s2.write(render_panel(1).encode() + "\r\n".encode())

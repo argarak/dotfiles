@@ -1,3 +1,6 @@
+# emacs tramp sucks
+[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
+
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
@@ -62,10 +65,13 @@ export LANG=en_GB.UTF-8
 
 # Preferred editor for local and remote sessions
  if [[ -n $SSH_CONNECTION ]]; then
-   export EDITOR='emacs -nw'
+   export EDITOR='emacsclient -nw'
  else
-   export EDITOR='nano'
+   #export EDITOR='nano'
  fi
+
+export EDITOR='/usr/bin/emacsclient -nw -c'
+alias emc='/usr/bin/emacsclient -nw -c'
 
 # Compilation flags
 export ARCHFLAGS="-arch x86_64"
@@ -86,14 +92,16 @@ export CLASSPATH=/usr/lib/spl.jar
 alias cava_mpd='cava -c red -d 'default' -i 'fifo' -p /tmp/mpd.fifo -s 150%'
 alias emacsterm='emacs -nw && emacsclient -nw'
 alias toxic='toxic -f .config/tox/tox_save.tox'
-alias rm="trash"
 alias yaourt="/home/kzer-za/apacman/apacman --noconfirm"
 alias dd="echo try using pv"
 alias asdf="setxkbmap -layout dvorak"
 alias cups_print="lp -d Photosmart_C4400_Recent"
 alias ap="apacman"
 alias venv="virtualenv"
+alias xc="xclip -selection c"
 eval "$(thefuck --alias fuck)"
+
+alias j0cc="WINEPREFIX='$HOME/.winej0ccd' WINEARCH=win32 wine"
 
 if [ -f ~/.dir_colors ]; then
     eval `dircolors ~/.dir_colors`
@@ -113,3 +121,12 @@ PATH="$HOME/.node/bin:$PATH"
 NODE_PATH="$HOME/.node/lib/node_modules:$NODE_PATH"
 MANPATH="$HOME/.node/share/man:$MANPATH"
 export QT_STYLE_OVERRIDE=kvantum
+alias get_lx106='export PATH="$PATH:$HOME/esp/xtensa-lx106-elf/bin"'
+alias irc="ssh weechat@nexus"
+#alias python="bpython"
+
+export VITASDK=/usr/local/vitasdk
+export PATH=$VITASDK/bin:$PATH
+
+export PATH=/home/kzer-za/.local/bin:$PATH
+export PATH=/home/kzer-za/.emacs.d/bin:$PATH

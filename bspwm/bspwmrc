@@ -3,10 +3,11 @@
 xset +fp /home/kzer-za/.fonts &
 xset fp rehash &
 
-dunst -fn 'ypn envypn' &
+dunst -fn 'GohuNew' &
 socat -d -d pty,raw,echo=0,link=/tmp/lemonbarin pty,raw,echo=0,link=/tmp/lemonbarout &
+socat -d -d pty,raw,echo=0,link=/tmp/lemonbarin2 pty,raw,echo=0,link=/tmp/lemonbarout2 &
 
-bspc config border_width        0
+bspc config border_width        1
 bspc config window_gap          5
 
 bspc config top_padding         24
@@ -16,16 +17,23 @@ bspc config split_ratio         0.52
 bspc config borderless_monocle  true
 bspc config gapless_monocle     true
 
-bspc monitor HDMI-0 -d 1 2 3 4 5 6 7 8 9 0
+bspc monitor HDMI-0 -d 1 2 3 4 5 6 7 8
+bspc monitor DP-1 -d 9 0
 
-bspc rule -a Gimp desktop=^8 follow=on floating=on
-bspc rule -a Chromium desktop=^2
-bspc rule -a mplayer2 floating=on
 bspc rule -a Kupfer.py focus=on
 bspc rule -a Screenkey manage=off
-bspc rule -a Emacs state=tiled split_ratio="0.2"
+bspc rule -a discord desktop='9'
+bspc rule -a librewolf desktop='2'
+bspc rule -a emacsclient desktop='4'
 
-sleep 0.5s
-cat /tmp/lemonbarin | lemonbar -p -g 1920x24+0+0 -d -o 0 -f "ypn envypn" -o \-1 -f '-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1' -B \#FF0a0a0a -u 2 &
+sleep 0.1s
+cat /tmp/lemonbarin | lemonbar -p -g 1920x24+0+0 -d -o 0 -f "GohuNew" -o \-1 -f '-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1' -B \#FF111111 -u 2 &
+cat /tmp/lemonbarin2 | lemonbar -p -g 1024x24+1920+0 -d -o 0 -f "GohuNew" -o \-1 -f '-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1' -B \#FF111111 -u 2 &
 python ~/start_new_panel.py &
 unclutter -root &
+conky &
+glava --desktop &
+discord &
+librewolf &
+emacsclient &
+systemctl --user start blugon &
